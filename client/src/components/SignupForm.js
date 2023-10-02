@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+'use client';
 
-import { createUser } from '../utils/API';
+import React, { useState } from 'react';
+// import { Form, Button, Alert } from 'react-bootstrap';
+
+//import { createUser } from '../utils/API';
 import Auth from '../utils/auth';
+
+import { useMutation, useContext } from '@apollo/client';
+import { ADD_USER } from '../utils/mutations';
 
 const SignupForm = () => {
   // set initial form state
@@ -12,12 +17,16 @@ const SignupForm = () => {
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
 
+  const [addUser] = useMutation(ADD_USER);
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
 
   const handleFormSubmit = async (event) => {
+    'use server';
+
     event.preventDefault();
 
     // check if form has everything (as per react-bootstrap docs)
@@ -28,15 +37,20 @@ const SignupForm = () => {
     }
 
     try {
-      const response = await createUser(userFormData);
+      // const response = await createUser(userFormData);
 
-      if (!response.ok) {
+      const  { data } = await addUser({
+        variables: { ...userFormData },
+      });   
+
+      if (!data) {
         throw new Error('something went wrong!');
-      }
+      } else {
 
-      const { token, user } = await response.json();
-      console.log(user);
-      Auth.login(token);
+      // const { token, user } = await response.json();
+      console.log(data);
+      Auth.login(data);
+      }
     } catch (err) {
       console.error(err);
       setShowAlert(true);
@@ -52,15 +66,15 @@ const SignupForm = () => {
   return (
     <>
       {/* This is needed for the validation functionality above */}
-      <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
+      <form noValidate validated={validated} onSubmit={handleFormSubmit}>
         {/* show alert if server response is bad */}
-        <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
+        <alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your signup!
-        </Alert>
+        </alert>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='username'>Username</Form.Label>
-          <Form.Control
+        <form className='mb-3'>
+          <label htmlFor='username'>Username</label>
+          <form
             type='text'
             placeholder='Your username'
             name='username'
@@ -68,12 +82,12 @@ const SignupForm = () => {
             value={userFormData.username}
             required
           />
-          <Form.Control.Feedback type='invalid'>Username is required!</Form.Control.Feedback>
-        </Form.Group>
+          {/* <form.Control.Feedback type='invalid'>Username is required!</Form.Control.Feedback> */}
+        </form>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='email'>Email</Form.Label>
-          <Form.Control
+        <form className='mb-3'>
+          <label htmlFor='email'>Email</label>
+          <input
             type='email'
             placeholder='Your email address'
             name='email'
@@ -81,12 +95,12 @@ const SignupForm = () => {
             value={userFormData.email}
             required
           />
-          <Form.Control.Feedback type='invalid'>Email is required!</Form.Control.Feedback>
-        </Form.Group>
+          {/* <formForm.Control.Feedback type='invalid'>Email is required!</Form.Control.Feedback> */}
+        </form>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='password'>Password</Form.Label>
-          <Form.Control
+        <form className='mb-3'>
+          <label htmlFor='password'>Password</label>
+          <inout
             type='password'
             placeholder='Your password'
             name='password'
@@ -94,15 +108,15 @@ const SignupForm = () => {
             value={userFormData.password}
             required
           />
-          <Form.Control.Feedback type='invalid'>Password is required!</Form.Control.Feedback>
-        </Form.Group>
-        <Button
+          {/* <Form.Control.Feedback type='invalid'>Password is required!</Form.Control.Feedback> */}
+        </form>
+        <button
           disabled={!(userFormData.username && userFormData.email && userFormData.password)}
           type='submit'
           variant='success'>
           Submit
-        </Button>
-      </Form>
+        </button>
+      </form>
     </>
   );
 };

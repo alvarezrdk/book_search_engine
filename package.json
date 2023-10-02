@@ -1,6 +1,9 @@
 {
   "name": "book-search-google",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.20.0"
+  },
   "description": "Book Search Engine",
   "main": "server/server.js",
   "scripts": {
@@ -24,6 +27,13 @@
   },
   "homepage": "https://github.com/alvarezrdk/book_search_engine#readme",
   "dependencies": {
-    "apollo-server-express": "^2.15.0"
+    "@apollo/client": "^3.8.3",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "apollo-server": "^3.12.1",
+    "apollo-server-express": "^3.6.1",
+    "babel": "^6.23.0",
+    "graphql": "^16.3.0",
+    "react-bootstrap": "^2.9.0",
+    "react-context": "^0.0.3"
   }
 }
