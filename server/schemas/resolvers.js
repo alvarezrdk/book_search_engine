@@ -1,26 +1,32 @@
 const { AuthenticationError } = require('apollo-server-express');
 //const { User } = require('../models');
 const { signToken } = require('../utils/auth');
-const { user} = require('../models/User');
+const { User } = require('../models');
 const { book} = require('../models/Book');
 const { author} = require('../models/Author');
 
 const resolvers = {
   Query: {
-    allusers() {
+    allusers: async(req, res) => {
+      const user = await User.find();
       return user;
     },
+    
+    me: async (parent, { username }) => {
+        const user = await User.find({ username: username });
+        return user;
+    },
   },
-    User: {
-      savedBook (parent) {
-        return book.filter((book) => book.branch === parent.branch);
-      }
-    },
-    Book: {
-      authors(parent) {
-        return author.filter((author) => author.branch === parent.branch);    
-      }
-    },
+    // User: {
+    //   savedBook (parent) {
+    //     return book.filter((book) => book.branch === parent.branch);
+    //   }
+    // },
+    // Book: {
+    //   authors(parent) {
+    //     return author.filter((author) => author.branch === parent.branch);    
+    //   }
+    // },
   
     // me: async (parent, { username }) => {
     //    return User.find({ username: username });
@@ -37,19 +43,19 @@ const resolvers = {
   
    Mutation: {
  
-    addUser: async (_, { username, email, password }) => {
-      const createdUsers = await user.create({ username, email, password });
-    
-      if (!users) {
+    addUser: async (parent, { username, email, password }) => {
+      const createdUsers = await User.create({ username, email, password });
+      console.log(username);
+      if (!createdUsers) {
         throw new Error('Something went wrong!');
       }
-      const token = signToken(user);
-      return { token, user: createdUsers };
+      const token = signToken(createdUsers);
+      return { token, createdUsers };
     },
   }
 }
 
- //   login: async (_, { email, password }) => {
+  //  login: async (_, { email, password }) => {
   //     const user = await User.findOne({ $or: [{ username: email }, { email }] });
   //     if (!user) {
   //       throw new Error("Can't find this user");
